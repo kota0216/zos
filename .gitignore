@@ -1,0 +1,16 @@
+# 開発環境・秘匿ファイル
+.env
+.env.*
+!.env.example
+
+# OS生成ファイル
+.DS_Store
+Thumbs.db
+
+# VSCode設定
+.vscode/
+
+# 依存パッケージ（もし追加した場合）
+node_modules/
+dist/
+build/
