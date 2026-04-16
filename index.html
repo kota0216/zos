@@ -51,11 +51,37 @@
         const overlay = document.getElementById('overlay');
         const explosionText = document.getElementById('explosionText');
 
-        // 音声枠組み
-        const playSound = (isFury) => {
-            console.log(isFury ? "爆発音を再生（激怒）" : "爆発音を再生（通常）");
-            // const audio = new Audio(isFury ? 'fury.mp3' : 'normal.mp3');
-            // audio.play();
+        // 音声合成とSEの準備
+        let audioCtx;
+        const initAudio = () => {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        };
+
+        const playSounds = async (isFury) => {
+            initAudio();
+            
+            // 1. 音声合成 (Web Speech API)
+            const utterance = new SpeechSynthesisUtterance("ゾォォォォス！！！");
+            utterance.lang = 'ja-JP';
+            utterance.pitch = 0.5; // 野太い声
+            utterance.rate = 0.8;
+            utterance.volume = 1.0;
+            window.speechSynthesis.speak(utterance);
+
+            // 2. SE (爆発音のサンプル)
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.5);
+            gain.gain.setValueAtTime(1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
         };
 
         btn.addEventListener('click', () => {
@@ -68,7 +94,7 @@
             overlay.classList.remove('hidden');
             explosionText.classList.remove('opacity-0');
             
-            playSound(isFury);
+            playSounds(isFury);
 
             // 演出時間
             setTimeout(() => {
