@@ -65,12 +65,11 @@
             // 1. 音声合成 (Web Speech API)
             const utterance = new SpeechSynthesisUtterance("ゾォォォォス！！！");
             const voices = window.speechSynthesis.getVoices();
-            // 男性っぽい声を探す（環境依存のため、見つからない場合は標準を使用）
             const maleVoice = voices.find(v => v.name.includes('Google') && v.name.includes('Male')) || voices[0];
             utterance.voice = maleVoice;
             utterance.lang = 'ja-JP';
-            utterance.pitch = 0.2; // さらに低く
-            utterance.rate = 0.7;  // ゆっくりで威圧的
+            utterance.pitch = 0.6; // 少し高くして張りを出す
+            utterance.rate = 1.2;  // 勢いを出す
             utterance.volume = 1.0;
             window.speechSynthesis.speak(utterance);
 
