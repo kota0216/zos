@@ -14,11 +14,11 @@
 </head>
 <body class="bg-black text-white h-[100dvh] flex flex-col p-6 overflow-hidden">
 
-    <div class="flex-grow flex flex-col justify-center gap-6">
-        <input type="text" id="goal" placeholder="本日の目標を入力" class="w-full p-4 bg-gray-800 text-2xl rounded-xl border border-yellow-600">
+    <div id="mainUI" class="flex-grow flex flex-col justify-center gap-6">
+        <input type="text" id="goal" placeholder="本日の目標を入力" class="w-full p-4 bg-gray-800 text-2xl rounded-xl border border-yellow-600 text-white">
         <div class="text-center">
             <label class="text-xl">達成率: <span id="rateVal">0</span>%</label>
-            <input type="range" id="rate" min="0" max="100" class="w-full h-4">
+            <input type="range" id="rate" min="0" max="100" value="0" class="w-full h-4">
         </div>
         <button id="submit" class="w-full py-8 text-4xl font-black bg-yellow-600 text-black rounded-3xl shadow-[0_0_50px_rgba(255,215,0,0.5)]">ゾス！と報告</button>
     </div>
@@ -30,36 +30,22 @@
         
         rateSlider.oninput = () => rateVal.textContent = rateSlider.value;
 
-        const playGoldBGM = () => {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 3);
-        };
-
         document.getElementById('submit').onclick = () => {
             const val = parseInt(rateSlider.value);
-            console.log("Submit clicked, rate:", val);
+            const goal = document.getElementById('goal').value;
+            console.log("Goal:", goal, "Rate:", val);
 
             if (val >= 100) {
-                console.log("Mode: Golden ZOS");
                 document.body.className = "gold-bg h-[100dvh] flex flex-col items-center justify-center";
                 document.body.innerHTML = `<h1 class="text-7xl font-black rainbow-text shake-fast">アメージング・ゾス！！！</h1>`;
-                playGoldBGM();
                 new SpeechSynthesisUtterance("アメージング・ゾス！！！").speak(window.speechSynthesis);
             } else if (val >= 50) {
-                console.log("Mode: Normal ZOS");
-                alert("まあまあだな。次いけ！");
+                alert("目標: " + goal + "。まあまあだな。次いけ！");
             } else {
-                console.log("Mode: Angry ZOS");
                 document.body.className = "bg-red-600 h-[100dvh] flex flex-col items-center justify-center";
                 document.body.innerHTML = `<h1 class="text-7xl font-black shake-fast">ゾォォォォス！！！</h1>`;
                 new SpeechSynthesisUtterance("ふざけるな！数字がすべてだ！").speak(window.speechSynthesis);
+                setTimeout(() => location.reload(), 3000);
             }
         };
     </script>
