@@ -30,24 +30,18 @@
         
         rateSlider.oninput = () => rateVal.textContent = rateSlider.value;
 
-        const speak = (text, pitch = 0.5) => {
+        const speak = (text, pitch = 0.5, rate = 1.0) => {
             const u = new SpeechSynthesisUtterance(text);
             u.pitch = pitch;
-            u.rate = 1.0;
+            u.rate = rate;
             window.speechSynthesis.speak(u);
         };
 
-        const playAmazingGrace = () => {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const notes = [440, 554, 659, 554, 659, 587, 523];
-            let time = audioCtx.currentTime;
-            notes.forEach((freq, i) => {
-                const osc = audioCtx.createOscillator();
-                osc.connect(audioCtx.destination);
-                osc.frequency.setValueAtTime(freq, time + i * 0.5);
-                osc.start(time + i * 0.5);
-                osc.stop(time + i * 0.5 + 0.4);
-            });
+        const playAmazingBGM = () => {
+            const audio = new Audio("https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg"); // 代替音源（高揚感のあるものに変更可）
+            audio.loop = true;
+            audio.play();
+            return audio;
         };
 
         document.getElementById('submit').onclick = () => {
@@ -57,15 +51,15 @@
             if (val >= 100) {
                 document.body.className = "gold-bg h-[100dvh] flex flex-col items-center justify-center";
                 document.body.innerHTML = `<h1 class="text-7xl font-black rainbow-text shake-fast">アメージング・ゾス！！！</h1><button onclick="location.reload()" class="mt-10 p-6 bg-black text-white rounded-full">戻る</button>`;
-                playAmazingGrace();
-                speak("アメージング・ゾス！！！");
+                playAmazingBGM();
+                speak("アメージング・ゾス！！！", 1.2, 1.2);
             } else if (val >= 50) {
-                speak("まあまあだな。次いけ！", 0.5);
-                alert("目標: " + goal + "。まあまあだな。次いけ！");
+                speak("まあまあだな。つぎ、いけ！", 0.6, 1.0);
+                alert("目標: " + goal + "。まあまあだな。つぎ、いけ！");
             } else {
                 document.body.className = "bg-red-600 h-[100dvh] flex flex-col items-center justify-center";
                 document.body.innerHTML = `<h1 class="text-7xl font-black shake-fast">ゾォォォォス！！！</h1><button onclick="location.reload()" class="mt-10 p-6 bg-black text-white rounded-full">戻る</button>`;
-                speak("ふざけるな！数字がすべてだ！ゾス！！", 0.1);
+                speak("ふざけるな！数字がすべてだ！ゾス！！", 0.1, 0.8);
             }
         };
     </script>
