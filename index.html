@@ -27,35 +27,47 @@
         let audioCtx;
         const rateSlider = document.getElementById('rate');
         const rateVal = document.getElementById('rateVal');
-        
         rateSlider.oninput = () => rateVal.textContent = rateSlider.value;
 
+        // 音声合成関数
         const speak = (text, pitch = 0.5, rate = 1.0) => {
             const u = new SpeechSynthesisUtterance(text);
-            u.pitch = pitch;
-            u.rate = rate;
+            u.pitch = pitch; u.rate = rate;
             window.speechSynthesis.speak(u);
         };
 
-        const playAmazingBGM = () => {
-            const audio = new Audio("https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg"); // 代替音源（高揚感のあるものに変更可）
-            audio.loop = true;
-            audio.play();
-            return audio;
+        // Web Audio APIによる旋律再生
+        const playAmazingGraceMelody = async () => {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') await audioCtx.resume();
+            
+            const melody = [392, 493.88, 587.33, 493.88, 587.33, 523.25, 440]; // ソシレシレドラ
+            melody.forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.6);
+                gain.gain.setValueAtTime(0.5, audioCtx.currentTime + i * 0.6);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.6 + 0.5);
+                osc.start(audioCtx.currentTime + i * 0.6);
+                osc.stop(audioCtx.currentTime + i * 0.6 + 0.5);
+            });
         };
 
-        document.getElementById('submit').onclick = () => {
-            const val = parseInt(rateSlider.value);
-            const goal = document.getElementById('goal').value;
+        document.getElementById('submit').onclick = async () => {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            await audioCtx.resume();
 
+            const val = parseInt(rateSlider.value);
             if (val >= 100) {
-                document.body.className = "gold-bg h-[100dvh] flex flex-col items-center justify-center";
-                document.body.innerHTML = `<h1 class="text-7xl font-black rainbow-text shake-fast">アメージング・ゾス！！！</h1><button onclick="location.reload()" class="mt-10 p-6 bg-black text-white rounded-full">戻る</button>`;
-                playAmazingBGM();
-                speak("アメージング・ゾス！！！", 1.2, 1.2);
+                document.body.className = "gold-bg h-[100dvh] flex flex-col items-center justify-center animate-pulse";
+                document.body.innerHTML = `<h1 class="text-7xl font-black rainbow-text shake-fast">アメージング・ゾス……！！！</h1><button onclick="location.reload()" class="mt-10 p-6 bg-black text-white rounded-full">戻る</button>`;
+                playAmazingGraceMelody();
+                speak("アメージング・ゾス……！！！", 0.3, 0.7);
             } else if (val >= 50) {
                 speak("まあまあだな。つぎ、いけ！", 0.6, 1.0);
-                alert("目標: " + goal + "。まあまあだな。つぎ、いけ！");
             } else {
                 document.body.className = "bg-red-600 h-[100dvh] flex flex-col items-center justify-center";
                 document.body.innerHTML = `<h1 class="text-7xl font-black shake-fast">ゾォォォォス！！！</h1><button onclick="location.reload()" class="mt-10 p-6 bg-black text-white rounded-full">戻る</button>`;
