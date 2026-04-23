@@ -29,19 +29,20 @@
         const rateVal = document.getElementById('rateVal');
         rateSlider.oninput = () => rateVal.textContent = rateSlider.value;
 
-        // 音声合成関数
+        // 音声合成関数 (修正: ブラウザの自動再生制限を考慮し、明示的に呼び出し)
         const speak = (text, pitch = 0.5, rate = 1.0) => {
+            window.speechSynthesis.cancel(); // 前の読み上げを中断して即座に再生
             const u = new SpeechSynthesisUtterance(text);
             u.pitch = pitch; u.rate = rate;
             window.speechSynthesis.speak(u);
         };
 
-        // Web Audio APIによる旋律再生
+        // Web Audio APIによる旋律再生 (修正: コンテキストの再利用とresume)
         const playAmazingGraceMelody = async () => {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === 'suspended') await audioCtx.resume();
             
-            const melody = [392, 493.88, 587.33, 493.88, 587.33, 523.25, 440]; // ソシレシレドラ
+            const melody = [392, 493.88, 587.33, 493.88, 587.33, 523.25, 440];
             melody.forEach((freq, i) => {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
